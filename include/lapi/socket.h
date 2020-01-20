@@ -19,6 +19,7 @@
 #ifndef __LAPI_SOCKET_H__
 #define __LAPI_SOCKET_H__
 
+#include "config.h"
 #include <sys/socket.h>
 
 #ifndef MSG_ZEROCOPY
@@ -35,6 +36,10 @@
 
 #ifndef SO_BUSY_POLL
 # define SO_BUSY_POLL	46
+#endif
+
+#ifndef SO_ATTACH_BPF
+# define SO_ATTACH_BPF  50
 #endif
 
 #ifndef SO_ZEROCOPY
@@ -67,6 +72,13 @@
 
 #ifndef SOL_ALG
 # define SOL_ALG		279
+#endif
+
+#ifndef HAVE_STRUCT_MMSGHDR
+struct mmsghdr {
+	struct msghdr msg_hdr;
+	unsigned int msg_len;
+};
 #endif
 
 #endif /* __LAPI_SOCKET_H__ */

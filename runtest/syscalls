@@ -32,6 +32,11 @@ bind01 bind01
 bind02 bind02
 bind03 bind03
 
+bpf_map01 bpf_map01
+bpf_prog01 bpf_prog01
+bpf_prog02 bpf_prog02
+bpf_prog03 bpf_prog03
+
 brk01 brk01
 
 capget01 capget01
@@ -39,6 +44,8 @@ capget02 capget02
 
 capset01 capset01
 capset02 capset02
+capset03 capset03
+capset04 capset04
 
 cacheflush01 cacheflush01
 
@@ -83,6 +90,7 @@ clock_nanosleep2_01 clock_nanosleep2_01
 
 clock_gettime01 clock_gettime01
 clock_gettime02 clock_gettime02
+leapsec01 leapsec01
 
 clock_settime01 clock_settime01
 clock_settime02 clock_settime02
@@ -353,8 +361,6 @@ fsync04 fsync04
 
 ftruncate01 ftruncate01
 ftruncate01_64 ftruncate01_64
-ftruncate02 ftruncate02
-ftruncate02_64 ftruncate02_64
 ftruncate03 ftruncate03
 ftruncate03_64 ftruncate03_64
 ftruncate04 ftruncate04
@@ -532,12 +538,20 @@ fanotify09 fanotify09
 fanotify10 fanotify10
 fanotify11 fanotify11
 fanotify12 fanotify12
+fanotify13 fanotify13
+fanotify14 fanotify14
+fanotify15 fanotify15
 
 ioperm01 ioperm01
 ioperm02 ioperm02
 
 iopl01 iopl01
 iopl02 iopl02
+
+ioprio_get01 ioprio_get01
+ioprio_set01 ioprio_set01
+ioprio_set02 ioprio_set02
+ioprio_set03 ioprio_set03
 
 io_cancel01 io_cancel01
 io_destroy01 io_destroy01
@@ -621,12 +635,13 @@ lstat01 lstat01
 lstat01_64 lstat01_64
 lstat02 lstat02
 lstat02_64 lstat02_64
-lstat03 lstat03
-lstat03_64 lstat03_64
 
 mallopt01 mallopt01
 
 mbind01 mbind01
+mbind02 mbind02
+mbind03 mbind03
+mbind04 mbind04
 
 memset01 memset01
 memcmp01 memcmp01
@@ -710,7 +725,6 @@ move_pages04 move_pages04
 move_pages05 move_pages05
 move_pages06 move_pages06
 move_pages07 move_pages07
-move_pages08 move_pages08
 move_pages09 move_pages09
 move_pages10 move_pages10
 move_pages11 move_pages11
@@ -720,6 +734,8 @@ mprotect01 mprotect01
 mprotect02 mprotect02
 mprotect03 mprotect03
 mprotect04 mprotect04
+
+pkey01 pkey01
 
 mq_notify01 mq_notify01
 mq_notify02 mq_notify02
@@ -778,7 +794,6 @@ munmap03 munmap03
 
 nanosleep01 nanosleep01
 nanosleep02 nanosleep02
-nanosleep03 nanosleep03
 nanosleep04 nanosleep04
 
 nftw01 nftw01
@@ -833,6 +848,10 @@ pause03 pause03
 personality01 personality01
 personality02 personality02
 
+pidfd_send_signal01 pidfd_send_signal01
+pidfd_send_signal02 pidfd_send_signal02
+pidfd_send_signal03 pidfd_send_signal03
+
 pipe01 pipe01
 pipe02 pipe02
 pipe03 pipe03
@@ -860,6 +879,10 @@ prctl02 prctl02
 prctl03 prctl03
 prctl04 prctl04
 prctl05 prctl05
+prctl06 prctl06
+prctl07 prctl07
+prctl08 prctl08
+prctl09 prctl09
 
 pread01 pread01
 pread01_64 pread01_64
@@ -934,6 +957,9 @@ pwritev202_64 pwritev202_64
 quotactl01 quotactl01
 quotactl02 quotactl02
 quotactl03 quotactl03
+quotactl04 quotactl04
+quotactl05 quotactl05
+quotactl06 quotactl06
 
 read01 read01
 read02 read02
@@ -1108,8 +1134,19 @@ sendfile09_64 sendfile09_64
 sendmsg01 sendmsg01
 sendmsg02 sendmsg02
 
+sendmmsg01 sendmmsg01
+
 sendto01 sendto01
 sendto02 sendto02
+
+set_mempolicy01 set_mempolicy01
+set_mempolicy02 set_mempolicy02
+set_mempolicy03 set_mempolicy03
+set_mempolicy04 set_mempolicy04
+
+set_robust_list01 set_robust_list01
+set_thread_area01 set_thread_area01
+set_tid_address01 set_tid_address01
 
 setdomainname01	setdomainname01
 setdomainname02	setdomainname02
@@ -1223,10 +1260,6 @@ setrlimit03 setrlimit03
 setrlimit04 setrlimit04
 setrlimit05 setrlimit05
 setrlimit06 setrlimit06
-
-set_robust_list01 set_robust_list01
-set_thread_area01 set_thread_area01
-set_tid_address01 set_tid_address01
 
 setsid01 setsid01
 
@@ -1429,8 +1462,18 @@ timerfd_create01 timerfd_create01
 timerfd_gettime01 timerfd_gettime01
 timerfd_settime01 timerfd_settime01
 
+timer_create01 timer_create01
+timer_create02 timer_create02
+timer_create03 timer_create03
+
+timer_delete01 timer_delete01
+timer_delete02 timer_delete02
+
 timer_getoverrun01 timer_getoverrun01
 timer_gettime01 timer_gettime01
+
+timer_settime01 timer_settime01
+timer_settime02 timer_settime02
 
 tkill01 tkill01
 tkill02 tkill02
@@ -1506,6 +1549,7 @@ vhangup02 vhangup02
 #vmsplice test cases
 vmsplice01 vmsplice01
 vmsplice02 vmsplice02
+vmsplice03 vmsplice03
 
 wait01 wait01
 wait02 wait02
@@ -1545,6 +1589,8 @@ writev07 writev07
 perf_event_open01 perf_event_open01
 perf_event_open02 perf_event_open02
 
+futex_cmp_requeue01 futex_cmp_requeue01
+futex_cmp_requeue02 futex_cmp_requeue02
 futex_wait01 futex_wait01
 futex_wait02 futex_wait02
 futex_wait03 futex_wait03

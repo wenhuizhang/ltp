@@ -49,7 +49,6 @@ static void setup(void)
 
 	pg_sz = getpagesize();
 
-	check_path(drop_caches_fname);
 	tst_res(TINFO, "dropping caches");
 	sync();
 	SAFE_FILE_PRINTF(drop_caches_fname, "3");
@@ -173,4 +172,8 @@ static struct tst_test test = {
 	.min_kver = "3.10.0",
 	.needs_tmpdir = 1,
 	.needs_root = 1,
+	.tags = (const struct tst_tag[]) {
+		{"linux-git", "55231e5c898c"},
+		{}
+	}
 };

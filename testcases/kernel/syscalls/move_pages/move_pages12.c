@@ -25,6 +25,7 @@
  *   mm/hugetlb: take page table lock in follow_huge_pmd()
  *
  *  Test #2:
+ *   #2.1:
  *   This is a regression test for the race condition, where move_pages()
  *   and soft offline are called on a single hugetlb page concurrently.
  *
@@ -36,6 +37,19 @@
  *
  *   mm, hugetlb: use pte_present() instead of pmd_present() in
  *   follow_huge_pmd()
+ *
+ *   #2.2:
+ *   This is also a regression test for an race condition causing SIGBUS
+ *   in hugepage migration/fault.
+ *
+ *   This bug was fixed by:
+ *
+ *   commit 4643d67e8cb0b3536ef0ab5cddd1cedc73fa14ad
+ *   Author: Mike Kravetz <mike.kravetz@oracle.com>
+ *   Date:   Tue Aug 13 15:38:00 2019 -0700
+ *
+ *   hugetlbfs: fix hugetlb page migration/fault race causing SIGBUS
+ *
  */
 
 #include <errno.h>
@@ -77,8 +91,8 @@ static void *addr;
 static int do_soft_offline(int tpgs)
 {
 	if (madvise(addr, tpgs * hpsz, MADV_SOFT_OFFLINE) == -1) {
-		if (errno != EINVAL)
-			tst_res(TFAIL | TTERRNO, "madvise failed");
+		if (errno != EINVAL && errno != EBUSY)
+			tst_res(TFAIL | TERRNO, "madvise failed");
 		return errno;
 	}
 	return 0;
@@ -111,6 +125,9 @@ static void do_child(int tpgs)
 		TEST(numa_move_pages(ppid, test_pages,
 			pages, nodes, status, MPOL_MF_MOVE_ALL));
 		if (TST_RET < 0) {
+			if (errno == ENOMEM)
+				continue;
+
 			tst_res(TFAIL | TTERRNO, "move_pages failed");
 			break;
 		}
@@ -121,7 +138,8 @@ static void do_child(int tpgs)
 
 static void do_test(unsigned int n)
 {
-	int i;
+	int i, ret;
+	void *ptr;
 	pid_t cpid = -1;
 	int status;
 	unsigned int twenty_percent = (tst_timeout_remaining() / 5);
@@ -136,18 +154,28 @@ static void do_test(unsigned int n)
 		do_child(tcases[n].tpages);
 
 	for (i = 0; i < LOOPS; i++) {
-		void *ptr;
+		ptr = mmap(NULL, tcases[n].tpages * hpsz,
+				PROT_READ | PROT_WRITE,
+				MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+		if (ptr == MAP_FAILED) {
+			if (i == 0)
+				tst_brk(TBROK | TERRNO, "Cannot allocate hugepage");
 
-		ptr = SAFE_MMAP(NULL, tcases[n].tpages * hpsz,
-			PROT_READ | PROT_WRITE,
-			MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+			if (errno == ENOMEM) {
+				usleep(1000);
+				continue;
+			}
+		}
+
 		if (ptr != addr)
 			tst_brk(TBROK, "Failed to mmap at desired addr");
 
 		memset(addr, 0, tcases[n].tpages * hpsz);
 
 		if (tcases[n].offline) {
-			if (do_soft_offline(tcases[n].tpages) == EINVAL) {
+			ret = do_soft_offline(tcases[n].tpages);
+
+			if (ret == EINVAL) {
 				SAFE_KILL(cpid, SIGKILL);
 				SAFE_WAITPID(cpid, &status, 0);
 				SAFE_MUNMAP(addr, tcases[n].tpages * hpsz);
@@ -302,6 +330,12 @@ static struct tst_test test = {
 	.cleanup = cleanup,
 	.test = do_test,
 	.tcnt = ARRAY_SIZE(tcases),
+	.tags = (const struct tst_tag[]) {
+		{"linux-git", "e66f17ff7177"},
+		{"linux-git", "c9d398fa2378"},
+		{"linux-git", "4643d67e8cb0"},
+		{}
+	}
 };
 
 #else
